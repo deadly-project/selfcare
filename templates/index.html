@@ -2,29 +2,143 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <!-- INDISPENSABLE POUR MOBILE : adapte l'échelle de la page à l'écran -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analyseur MVola</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #f4f7f6; color: #333; }
-        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h1 { color: #e60000; font-size: 22px; margin-bottom: 20px; }
-        input[type="file"] { margin: 15px 0; padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
-        button { background: #e60000; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; }
+        /* Styles généraux adaptatifs */
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 700px; 
+            margin: 20px auto; 
+            padding: 0 15px; 
+            background: #f4f7f6; 
+            color: #333; 
+            box-sizing: border-box;
+        }
+        
+        .card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+        }
+
+        h1 { 
+            color: #e60000; 
+            font-size: 20px; 
+            margin-bottom: 15px; 
+            text-align: center;
+        }
+
+        label {
+            font-size: 14px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="file"] { 
+            margin: 10px 0 15px 0; 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            width: 100%; 
+            box-sizing: border-box; 
+            background: #fafafa;
+        }
+
+        /* Boutons larges et ergonomiques pour le tactile */
+        button { 
+            background: #e60000; 
+            color: white; 
+            border: none; 
+            padding: 14px 20px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            width: 100%; 
+            margin-top: 10px; 
+            font-weight: bold;
+        }
         button:hover { background: #cc0000; }
+        
         .btn-secondary { background: #6c757d; }
         .btn-secondary:hover { background: #5a6268; }
-        .resultats { margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
-        .error { color: #d9534f; background: #fdf7f7; padding: 15px; border-radius: 4px; border: 1px solid #f5c6cb; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .info-item { background: #f9f9f9; padding: 10px; border-radius: 4px; font-size: 14px; }
-        .total { font-weight: bold; font-size: 18px; color: #2e7d32; margin-top: 15px; background: #e8f5e9; padding: 10px; border-radius: 4px; }
-        ul { max-height: 150px; overflow-y: auto; background: #fafafa; padding: 10px 20px; border: 1px solid #eee; border-radius: 4px; }
+
+        .resultats { 
+            margin-top: 20px; 
+            border-top: 2px solid #eee; 
+            padding-top: 15px; 
+        }
+
+        .error { 
+            color: #d9534f; 
+            background: #fdf7f7; 
+            padding: 12px; 
+            border-radius: 4px; 
+            border: 1px solid #f5c6cb; 
+            font-size: 14px;
+        }
+
+        /* Grille adaptative : passe en 1 seule colonne sur les petits écrans mobiles */
+        .info-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            margin-bottom: 15px; 
+        }
+
+        .info-item { 
+            background: #f9f9f9; 
+            padding: 10px; 
+            border-radius: 4px; 
+            font-size: 13px; 
+            word-break: break-all;
+        }
+
+        .total { 
+            font-weight: bold; 
+            font-size: 16px; 
+            color: #2e7d32; 
+            margin-top: 15px; 
+            background: #e8f5e9; 
+            padding: 12px; 
+            border-radius: 4px; 
+            text-align: center;
+        }
+
+        ul { 
+            max-height: 180px; 
+            overflow-y: auto; 
+            background: #fafafa; 
+            padding: 10px 15px; 
+            border: 1px solid #eee; 
+            border-radius: 4px; 
+            font-size: 14px;
+        }
+
+        /* Media Query pour les téléphones étroits (< 480px) */
+        @media (max-width: 480px) {
+            body {
+                margin: 10px auto;
+                padding: 0 10px;
+            }
+            .card {
+                padding: 15px;
+            }
+            .info-grid {
+                grid-template-columns: 1fr; /* Transforme la grille 2 colonnes en 1 seule colonne empilée */
+            }
+            h1 {
+                font-size: 18px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="card">
         <h1>Analyseur de Relevé MVola</h1>
         
-        <!-- Formulaire affiché s'il n'y a pas encore de résultat -->
         {% if not resultat %}
             <form method="POST" enctype="multipart/form-data" id="uploadForm">
                 <label for="pdf_file">Choisissez votre fichier PDF MVola :</label>
@@ -44,7 +158,7 @@
                         <div class="info-item"><strong>Solde Final :</strong> {{ resultat.final }} Ar</div>
                     </div>
                     
-                    <h3>Détail des transactions (Transferts) :</h3>
+                    <h3>Détail des transferts :</h3>
                     <ul>
                     {% for m in resultat.montants %}
                         <li>Montant : <strong>{{ m }} Ar</strong></li>
@@ -52,7 +166,7 @@
                     </ul>
                     
                     <div class="total">
-                        Total des transferts : {{ resultat.total }} Ar
+                        Total : {{ resultat.total }} Ar
                     </div>
                 {% else %}
                     <div class="error">
@@ -60,15 +174,13 @@
                     </div>
                 {% endif %}
 
-                <!-- Bouton Actualiser / Recommencer -->
-                <button type="button" class="btn-secondary" onclick="resetInterface()">Actualiser / Choisir un autre fichier</button>
+                <button type="button" class="btn-secondary" onclick="resetInterface()">Actualiser / Autre fichier</button>
             </div>
         {% endif %}
     </div>
 
     <script>
         function resetInterface() {
-            // Recharge la page pour vider l'état et réinitialiser complètement le formulaire
             window.location.href = "/";
         }
     </script>
