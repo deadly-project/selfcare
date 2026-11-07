@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Analyseur MVola</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #f4f7f6; color: #333; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { color: #e60000; font-size: 22px; margin-bottom: 20px; }
+        input[type="file"] { margin: 15px 0; padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        button { background: #e60000; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; }
+        button:hover { background: #cc0000; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #5a6268; }
+        .resultats { margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
+        .error { color: #d9534f; background: #fdf7f7; padding: 15px; border-radius: 4px; border: 1px solid #f5c6cb; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .info-item { background: #f9f9f9; padding: 10px; border-radius: 4px; font-size: 14px; }
+        .total { font-weight: bold; font-size: 18px; color: #2e7d32; margin-top: 15px; background: #e8f5e9; padding: 10px; border-radius: 4px; }
+        ul { max-height: 150px; overflow-y: auto; background: #fafafa; padding: 10px 20px; border: 1px solid #eee; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Analyseur de Relevé MVola</h1>
+        
+        <!-- Formulaire affiché s'il n'y a pas encore de résultat -->
+        {% if not resultat %}
+            <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                <label for="pdf_file">Choisissez votre fichier PDF MVola :</label>
+                <input type="file" name="pdf_file" id="pdf_file" accept=".pdf" required>
+                <button type="submit">Analyser</button>
+            </form>
+        {% endif %}
+
+        {% if resultat %}
+            <div class="resultats">
+                {% if resultat.succes %}
+                    <h2>Résultats</h2>
+                    <div class="info-grid">
+                        <div class="info-item"><strong>Compte :</strong> {{ resultat.compte }}</div>
+                        <div class="info-item"><strong>Période :</strong> {{ resultat.periode }}</div>
+                        <div class="info-item"><strong>Solde Initial :</strong> {{ resultat.initial }} Ar</div>
+                        <div class="info-item"><strong>Solde Final :</strong> {{ resultat.final }} Ar</div>
+                    </div>
+                    
+                    <h3>Détail des transactions (Transferts) :</h3>
+                    <ul>
+                    {% for m in resultat.montants %}
+                        <li>Montant : <strong>{{ m }} Ar</strong></li>
+                    {% endfor %}
+                    </ul>
+                    
+                    <div class="total">
+                        Total des transferts : {{ resultat.total }} Ar
+                    </div>
+                {% else %}
+                    <div class="error">
+                        <strong>Erreur :</strong> {{ resultat.erreur }}
+                    </div>
+                {% endif %}
+
+                <!-- Bouton Actualiser / Recommencer -->
+                <button type="button" class="btn-secondary" onclick="resetInterface()">Actualiser / Choisir un autre fichier</button>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function resetInterface() {
+            // Recharge la page pour vider l'état et réinitialiser complètement le formulaire
+            window.location.href = "/";
+        }
+    </script>
+</body>
+</html>
