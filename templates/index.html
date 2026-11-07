@@ -117,6 +117,28 @@
             font-size: 14px;
         }
 
+        /* Styles pour l'animation de chargement (Spinner) */
+        #loading-overlay {
+            display: none; /* Caché par défaut */
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #e60000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* Media Query pour les téléphones étroits (< 480px) */
         @media (max-width: 480px) {
             body {
@@ -127,7 +149,7 @@
                 padding: 15px;
             }
             .info-grid {
-                grid-template-columns: 1fr; /* Transforme la grille 2 colonnes en 1 seule colonne empilée */
+                grid-template-columns: 1fr; 
             }
             h1 {
                 font-size: 18px;
@@ -140,11 +162,19 @@
         <h1>Analyseur de Relevé MVola</h1>
         
         {% if not resultat %}
-            <form method="POST" enctype="multipart/form-data" id="uploadForm">
+            <!-- Formulaire d'upload -->
+            <form method="POST" enctype="multipart/form-data" id="uploadForm" onsubmit="afficherChargement()">
                 <label for="pdf_file">Choisissez votre fichier PDF MVola :</label>
                 <input type="file" name="pdf_file" id="pdf_file" accept=".pdf" required>
-                <button type="submit">Analyser</button>
+                <button type="submit" id="submitBtn">Analyser</button>
             </form>
+
+            <!-- Animation de chargement cachée au départ -->
+            <div id="loading-overlay">
+                <div class="spinner"></div>
+                <p style="color: #666; font-size: 15px; font-weight: bold;">Analyse du fichier en cours...</p>
+                <p style="color: #999; font-size: 13px;">Veuillez patienter quelques secondes.</p>
+            </div>
         {% endif %}
 
         {% if resultat %}
@@ -180,6 +210,16 @@
     </div>
 
     <script>
+        function afficherChargement() {
+            // Vérifie si un fichier a bien été sélectionné
+            const fileInput = document.getElementById('pdf_file');
+            if (fileInput.files.length > 0) {
+                // Masque le formulaire et affiche l'animation de chargement
+                document.getElementById('uploadForm').style.display = 'none';
+                document.getElementById('loading-overlay').style.display = 'block';
+            }
+        }
+
         function resetInterface() {
             window.location.href = "/";
         }
